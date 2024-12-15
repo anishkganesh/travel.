@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>routes.</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,...">
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Garamond', serif;
+            margin: 0;
+            background-color: #fafafa;
+            color: #333;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Top Section: Header and Back Button */
+        .top-section {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 48px; 
+        }
+
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 18px;
+        }
+
+        /* Filter Section: Sorting and Category Filtering */
+        .filter-section {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .filter-section label {
+            display: block;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .filter-section .custom-select {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .custom-select input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            font-family: 'Garamond', serif;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        .custom-select .options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1;
+        }
+
+        .custom-select .options div {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'Garamond', serif;
+        }
+
+        .custom-select .options div:hover {
+            background-color: #f0f0f0;
+        }
+
+        .custom-select .selected-options {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .custom-select .selected-options .tag {
+            background-color: #e0e0e0;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-family: 'Garamond', serif;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-select .selected-options .tag .remove {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            font-family: 'Garamond', serif;
+        }
+
+        .success-message {
+            color: green;
+            font-size: 14px;
+            margin-top: 5px;
+            font-family: 'Garamond', serif;
+        }
+
+        .minimal-button {
+            margin-top: 20px;
+            font-size: 18px;
+            cursor: pointer;
+            font-family: 'Garamond', serif;
+            background: none;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            transition: background-color 0.3s;
+        }
+
+        .minimal-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Routes List Styling */
+        .routes-list {
+            list-style-type: none;
+            padding: 0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .routes-list li {
+            background-color: #fff;
+            margin-bottom: 15px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            font-size: 18px;
+            font-family: 'Garamond', serif;
+            cursor: pointer;
+        }
+
+        .routes-list li:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* City Route Styling */
+        .city-route {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .city-route:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            font-family: 'Garamond', serif;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px; /* Increased width to accommodate more details */
+            position: relative;
+            font-size: 18px;
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal h2 {
+            margin-top: 0;
+        }
+
+        .modal ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .modal ul li {
+            margin-bottom: 10px;
+        }
+
+        /* Results Count Styling */
+        .results-count {
+            font-size: 18px;
+            margin-top: 10px;
+            font-family: 'Garamond', serif;
+        }
+
+        /* Information Sections within Modal */
+        .info-section {
+            margin-top: 20px;
+        }
+
+        .info-section h3 {
+            margin-bottom: 10px;
+        }
+
+        .neighboring-city {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .neighboring-city:hover {
+            text-decoration: underline;
+        }
+
+        /* Additional styling for attraction details */
+        .attraction-details {
+            margin-bottom: 10px;
+        }
+
+        .attraction-details strong {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Section: App Title and Back Button -->
+    <div class="top-section">
+        <h1>routes.</h1>
+        <button onclick="goBack()" class="minimal-button back-button">Back</button>
+    </div>
+
+    <!-- Filter Section: Sorting and Category Filtering -->
+    <div class="filter-section">
+        <!-- Sort By Dropdown -->
+        <label for="sort-by">Sort By:</label>
+        <select id="sort-by" class="minimal-input" style="font-family: 'Garamond', serif; font-size: 16px; padding: 10px; width: 100%; max-width: 500px; margin: 0 auto; border: 1px solid #ccc; box-sizing: border-box;">
+            <option value="distance">Total Distance (Ascending)</option>
+            <option value="distance-desc">Total Distance (Descending)</option>
+        </select>
+
+        <!-- Category Filtering -->
+        <label for="categories">Filter By Categories (Max 3):</label>
+        <div id="category-select" class="custom-select">
+            <input type="text" id="category-input" placeholder="Select Categories" readonly>
+            <div class="options" id="category-options"></div>
+            <div class="selected-options" id="selected-categories"></div>
+        </div>
+        <div id="category-error" class="error-message"></div>
+        <div id="category-success" class="success-message"></div>
+
+        <!-- Apply and Reset Filters Buttons -->
+        <button onclick="applyFilters()" class="minimal-button">Apply Filters</button>
+        <button onclick="resetFilters()" class="minimal-button">Reset Filters</button>
+    </div>
+
+    <!-- Results Count Display -->
+    <div class="results-count" id="results-count">Total Results: 0</div>
+
+    <!-- Routes List: Displaying Available Routes -->
+    <ul id="routes-list" class="routes-list"></ul>
+
+    <!-- Route Modal: Displays Detailed Information About a Route -->
+    <div id="route-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRouteModal()">&times;</span>
+            <h2>Route Details</h2>
+            <p id="route-info"></p>
+            <ul id="route-cities-list"></ul>
+            <div class="info-section">
+                <h3>City Rank by Unique Attractions</h3>
+                <p id="route-city-rank"></p>
+            </div>
+            <div class="info-section">
+                <h3>Top City Categories (Entire Route)</h3>
+                <ul id="route-top-categories-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- City Modal: Displays Detailed Information About a City -->
+    <div id="city-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCityModal()">&times;</span>
+            <h2 id="city-name">City Name</h2>
+            <p id="city-coordinates">Latitude: , Longitude: </p>
+            <p id="city-popdensity"></p>
+
+            <!-- Subcategory Filtering within City Modal -->
+            <h3>Available Subcategories:</h3>
+            <div id="subcategory-select" class="custom-select" style="position: relative;">
+                <input type="text" id="subcategory-input" placeholder="Select Subcategories" readonly>
+                <div class="options" id="subcategory-options" style="position: absolute;"></div>
+                <div class="selected-options" id="selected-subcategories"></div>
+            </div>
+
+            <!-- Success Message for Attraction Filtering -->
+            <div id="attraction-filter-success" class="success-message"></div>
+
+            <!-- Apply and Reset Attraction Filters Buttons -->
+            <button onclick="applyAttractionFilters()" class="minimal-button">Apply Filters</button>
+            <button onclick="resetAttractionFilters()" class="minimal-button">Reset Filters</button>
+
+            <!-- Attractions List: Displays Attractions in the City -->
+            <h3>Attractions:</h3>
+            <ul id="attractions-list"></ul>
+
+            <!-- Additional Information Sections -->
+            <div class="info-section">
+                <h3>Neighboring City Recommendations</h3>
+                <p id="city-recs-info"></p>
+            </div>
+
+            <div class="info-section">
+                <h3>City Route Stats</h3>
+                <p id="city-route-stats"></p>
+            </div>
+
+            <div class="info-section">
+                <h3>Random Attraction</h3>
+                <p id="random-attraction-info"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /*
+            Frontend Logic for Routes Page
+            - Retrieves form data from localStorage
+            - Fetches routes based on user input by calling /routes endpoint
+            - Displays routes and allows filtering by categories
+            - Handles modals for route and city details
+        */
+
+        let allRoutes = []; // Stores all fetched routes
+        let selectedCategories = []; // Stores user-selected categories
+        let selectedSubcategories = []; // Stores user-selected subcategories
+        let filters = JSON.parse(localStorage.getItem('filters')) || { categories: [], sortBy: 'distance' };
+        const formData = JSON.parse(localStorage.getItem('formData'));
+
+        /* Sample Categories for Filtering */
+        const sampleCategories = [
+            'Event Planning & Services',
+            'Local Flavor',
+            'Shopping',
+            'Financial Services',
+            'Local Services',
+            'Restaurants',
+            'Hotel & Travel',
+            'Arts & Entertainment',
+            'Arts & Crafts',
+            'Active Life',
+            'Education',
+            'Food',
+            'Health & Medical',
+            'Nightlife',
+            'Beauty & Spas',
+            'Home Services',
+            'Mass Media',
+            'Automotive',
+            'Religious Organizations',
+            'Public Services & Government'
+        ];
+
+        /* Populate Category Options in Filter Section */
+        const categoryOptionsContainer = document.getElementById('category-options');
+        sampleCategories.forEach(category => {
+            const optionDiv = document.createElement('div');
+            optionDiv.textContent = category;
+            optionDiv.dataset.value = category;
+            optionDiv.addEventListener('click', () => selectCategory(optionDiv)); // Event listener for selecting a category
+            categoryOptionsContainer.appendChild(optionDiv);
+        });
+
+        /* Display Selected Categories as Tags */
+        const selectedCategoriesContainer = document.getElementById('selected-categories');
+        selectedCategories = filters.categories || [];
+
+        function updateSelectedCategories() {
+            selectedCategoriesContainer.innerHTML = '';
+            selectedCategories.forEach(category => {
+                const tagDiv = document.createElement('div');
+                tagDiv.classList.add('tag');
+                tagDiv.textContent = category;
+                const removeSpan = document.createElement('span');
+                removeSpan.classList.add('remove');
+                removeSpan.textContent = '×';
+                removeSpan.addEventListener('click', () => removeCategory(category)); // Event listener for removing a category
+                tagDiv.appendChild(removeSpan);
+                selectedCategoriesContainer.appendChild(tagDiv);
+            });
+            document.getElementById('category-input').value = '';
+            document.getElementById('category-error').textContent = '';
+            document.getElementById('category-success').textContent = '';
+        }
+
+        /* Function to Select a Category */
+        function selectCategory(optionDiv) {
+            const category = optionDiv.dataset.value;
+            if (!selectedCategories.includes(category)) {
+                if (selectedCategories.length < 3) { // Limit to 3 categories
+                    selectedCategories.push(category);
+                    updateSelectedCategories();
+                } else {
+                    document.getElementById('category-error').textContent = 'You can select up to 3 categories only.';
+                }
+            }
+        }
+
+        /* Function to Remove a Selected Category */
+        function removeCategory(category) {
+            selectedCategories = selectedCategories.filter(cat => cat !== category);
+            updateSelectedCategories();
+        }
+
+        /* Toggle Category Options Display on Input Click */
+        const categoryInput = document.getElementById('category-input');
+        categoryInput.addEventListener('click', () => {
+            const options = document.getElementById('category-options');
+            options.style.display = (options.style.display === 'block') ? 'none' : 'block';
+        });
+
+        /* Close Category Options Dropdown When Clicking Outside */
+        document.addEventListener('click', (event) => {
+            if (!document.getElementById('category-select').contains(event.target)) {
+                document.getElementById('category-options').style.display = 'none';
+            }
+        });
+
+        /* Display Selected Subcategories as Tags */
+        const selectedSubcategoriesContainer = document.getElementById('selected-subcategories');
+
+        function updateSelectedSubcategories() {
+            selectedSubcategoriesContainer.innerHTML = '';
+            if (selectedSubcategories.length === 0) {
+                const noSubs = document.createElement('p');
+                noSubs.textContent = 'No subcategories selected.';
+                selectedSubcategoriesContainer.appendChild(noSubs);
+                return;
+            }
+            selectedSubcategories.forEach(subcat => {
+                const tagDiv = document.createElement('div');
+                tagDiv.classList.add('tag');
+                tagDiv.textContent = subcat;
+                const removeSpan = document.createElement('span');
+                removeSpan.classList.add('remove');
+                removeSpan.textContent = '×';
+                removeSpan.addEventListener('click', () => removeSubcategory(subcat)); // Event listener for removing a subcategory
+                tagDiv.appendChild(removeSpan);
+                selectedSubcategoriesContainer.appendChild(tagDiv);
+            });
+        }
+
+        /* Function to Select a Subcategory */
+        function selectSubcategory(optionDiv) {
+            const subcat = optionDiv.dataset.value;
+            if (!selectedSubcategories.includes(subcat)) {
+                selectedSubcategories.push(subcat);
+                updateSelectedSubcategories();
+            }
+        }
+
+        /* Function to Remove a Selected Subcategory */
+        function removeSubcategory(subcat) {
+            selectedSubcategories = selectedSubcategories.filter(sc => sc !== subcat);
+            updateSelectedSubcategories();
+        }
+
+        /* Toggle Subcategory Options Display on Input Click */
+        const subcategoryInput = document.getElementById('subcategory-input');
+        subcategoryInput.addEventListener('click', () => {
+            const options = document.getElementById('subcategory-options');
+            options.style.display = (options.style.display === 'block') ? 'none' : 'block';
+        });
+
+        /* Close Subcategory Options Dropdown When Clicking Outside */
+        document.addEventListener('click', (event) => {
+            if (!document.getElementById('subcategory-select').contains(event.target)) {
+                document.getElementById('subcategory-options').style.display = 'none';
+            }
+        });
+
+        /* Set Sort By Dropdown to Saved Filter */
+        document.getElementById('sort-by').value = filters.sortBy;
+
+        /*
+            Fetch Routes Data
+            - Calls the /routes endpoint with user input parameters
+            - Returns fetched route data
+            - Query Example:
+              /routes?numInt=2&startCity=NewYork&startState=NY&endCity=LosAngeles&endState=CA
+        */
+        async function fetchRoutesData(numInt, startCity, startState, endCity, endState) {
+            const url = `http://localhost:8080/routes?numInt=${numInt}&startCity=${encodeURIComponent(startCity)}&startState=${encodeURIComponent(startState)}&endCity=${encodeURIComponent(endCity)}&endState=${encodeURIComponent(endState)}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            return data;
+        }
+
+        /*
+            Convert Routes Response
+            - Processes raw route data into a structured format
+            - Organizes cities within each route based on the number of intermediate cities
+        */
+        function convertRoutesResponse(data, numInt) {
+            return data.map(row => {
+                let routeCities = [];
+                if (numInt === 0) {
+                    routeCities = [
+                        {city: row.city1, state: row.state1},
+                        {city: row.city2, state: row.state2}
+                    ];
+                } else if (numInt === 1) {
+                    routeCities = [
+                        {city: row.city1, state: row.state1},
+                        {city: row.city2, state: row.state2},
+                        {city: row.city3, state: row.state3}
+                    ];
+                } else if (numInt === 2) {
+                    routeCities = [
+                        {city: row.city1, state: row.state1},
+                        {city: row.city2, state: row.state2},
+                        {city: row.city3, state: row.state3},
+                        {city: row.city4, state: row.state4}
+                    ];
+                } else if (numInt === 3) {
+                    routeCities = [
+                        {city: row.city1, state: row.state1},
+                        {city: row.city2, state: row.state2},
+                        {city: row.city3, state: row.state3},
+                        {city: row.city4, state: row.state4},
+                        {city: row.city5, state: row.state5}
+                    ];
+                }
+
+                return {
+                    cities: routeCities,
+                    distance: row.total_distance
+                };
+            });
+        }
+
+        /*
+            Load Route City IDs
+            - Fetches city IDs for all cities in a route by calling the /cities endpoint
+            - Returns an array of city IDs
+        */
+        async function loadRouteCityIds(route) {
+            const cityIds = [];
+            for (const cityObj of route.cities) {
+                const cityInfoRes = await fetch(`http://localhost:8080/cities?cityName=${encodeURIComponent(cityObj.city)}&stateName=${encodeURIComponent(cityObj.state)}`);
+                const cityInfo = await cityInfoRes.json();
+                if (cityInfo && cityInfo.cityid) {
+                    cityIds.push(cityInfo.cityid);
+                }
+            }
+            return cityIds;
+        }
+
+        /*
+            Show Route City Rank
+            - Displays the ranking of cities in a route based on unique attractions
+            - Calls /cityrankbyattractions and falls back to /cityrankbyattractionsbackup
+            - If both fail, displays a random ordering of cities
+            - Query Examples:
+              /cityrankbyattractions?cityIds=19511,25090,17705,...
+              /cityrankbyattractionsbackup?cityIds=19511,25090,17705,...
+        */
+        async function showRouteCityRank(route) {
+            const rankElement = document.getElementById('route-city-rank');
+            rankElement.textContent = '';
+            const cityIds = await loadRouteCityIds(route);
+            if (cityIds.length === 0) {
+                rankElement.textContent = 'No city ranking available.';
+                return;
+            }
+            const rankUrl = `http://localhost:8080/cityrankbyattractions?cityIds=${cityIds.join(',')}`;
+            let rankRes = await fetch(rankUrl);
+            let rankData = await rankRes.json();
+            if (!rankData || rankData.length === 0) {
+                // Fallback to backup ranking
+                const backupUrl = `http://localhost:8080/cityrankbyattractionsbackup?cityIds=${cityIds.join(',')}`;
+                rankRes = await fetch(backupUrl);
+                rankData = await rankRes.json();
+                if (!rankData || rankData.length === 0) {
+                    // If both rankings fail, display cities in random order
+                    const shuffledCities = shuffleArray(route.cities).map(c => `${c.city}`);
+                    rankElement.textContent = `City Ranking: ${shuffledCities.join(' > ')}`;
+                    return;
+                }
+                // Assuming backupData is an array of city names
+                const cities = rankData.map(cityObj => cityObj.cityname).filter(name => name); // Ensure names are present
+                if (cities.length === 0) {
+                    // If backup data also has no valid names, display random ordering
+                    const shuffledCities = shuffleArray(route.cities).map(c => `${c.city}`);
+                    rankElement.textContent = `City Ranking: ${shuffledCities.join(' > ')}`;
+                } else {
+                    rankElement.textContent = `Top 3 Cities by Unique Attractions: ${cities.join(' > ')}`;
+                }
+            } else {
+                const info = rankData[0];
+                const line = `Top 3 Cities by Unique Attractions: ${info.city1} > ${info.city2} > ${info.city3}. Distance: ${info.distance.toFixed(2)} miles, Total Attractions: ${info.totalnumberofattractions}`;
+                rankElement.textContent = line;
+            }
+        }
+
+        /*
+            Utility Function: Shuffle Array
+            - Randomizes the order of elements in an array
+        */
+        function shuffleArray(array) {
+            const shuffled = array.slice();
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        /*
+            Show Route Top Categories
+            - Displays top categories for the entire route by calling /topCityCategories
+            - Query Example:
+              /topCityCategories?cityIds=19511,25090,17705,...
+        */
+        async function showRouteTopCategories(route) {
+            const routeTopCategoriesList = document.getElementById('route-top-categories-list');
+            routeTopCategoriesList.innerHTML = '';
+            const cityIds = await loadRouteCityIds(route);
+            if (cityIds.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'No top categories available.';
+                routeTopCategoriesList.appendChild(li);
+                return;
+            }
+            const topCatRes = await fetch(`http://localhost:8080/topCityCategories?cityIds=${cityIds.join(',')}`);
+            const topCatData = await topCatRes.json();
+            if (!topCatData || topCatData.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'No top categories found for this route.';
+                routeTopCategoriesList.appendChild(li);
+            } else {
+                topCatData.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <strong>${item.category}</strong>: ${item.attractioncount} attractions<br>
+                        Top Attraction: ${item.name} (${item.rating} stars)<br>
+                        Address: ${item.address ? item.address : 'No address provided'}
+                    `;
+                    routeTopCategoriesList.appendChild(li);
+                });
+            }
+        }
+
+        /*
+            Load Routes
+            - Sorts routes based on user-selected filter
+            - Displays the list of routes in the UI
+        */
+        function loadRoutes() {
+            let routes = allRoutes;
+            if (filters.sortBy === 'distance') {
+                routes.sort((a, b) => a.distance - b.distance);
+            } else if (filters.sortBy === 'distance-desc') {
+                routes.sort((a, b) => b.distance - a.distance);
+            }
+
+            filters.categories = selectedCategories;
+            localStorage.setItem('filters', JSON.stringify(filters));
+
+            document.getElementById('results-count').textContent = `Total Results: ${routes.length}`;
+
+            const routesList = document.getElementById('routes-list');
+            routesList.innerHTML = '';
+            routes.forEach((route, index) => {
+                // Create clickable city links within each route
+                const cityLinks = route.cities.map((cityObj) => {
+                    return `<span class="city-route" data-city="${cityObj.city}" data-state="${cityObj.state}" data-route-index="${index}">${cityObj.city}</span>`;
+                });
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    Route through ${cityLinks.join(' ➔ ')}<br>
+                    Total Distance: ${route.distance} miles
+                `;
+
+                // Open route modal when route item is clicked (excluding city links)
+                li.addEventListener('click', (event) => {
+                    if (!event.target.classList.contains('city-route')) {
+                        openRouteModal(route);
+                    }
+                });
+
+                // Add event listeners to city links to open city modal
+                li.querySelectorAll('.city-route').forEach(cityElement => {
+                    cityElement.addEventListener('click', async (event) => {
+                        event.stopPropagation(); // Prevent triggering parent click event
+                        const cityName = event.target.dataset.city;
+                        const cityState = event.target.dataset.state;
+                        const routeIndex = event.target.dataset.routeIndex;
+
+                        // Fetch city info by calling /cities endpoint
+                        const cityInfoRes = await fetch(`http://localhost:8080/cities?cityName=${encodeURIComponent(cityName)}&stateName=${encodeURIComponent(cityState)}`);
+                        const cityInfo = await cityInfoRes.json();
+                        if (cityInfo && cityInfo.cityid) {
+                            document.getElementById('city-name').textContent = `${cityName}, ${cityState} (City ID: ${cityInfo.cityid})`;
+                            openCityModal(allRoutes[routeIndex], cityName, cityState, cityInfo);
+                        } else {
+                            alert('City info not found.');
+                        }
+                    });
+                });
+
+                routesList.appendChild(li);
+            });
+        }
+
+        /*
+            Apply Filters
+            - Updates filters based on user selection
+            - Reloads routes to reflect applied filters
+        */
+        function applyFilters() {
+            filters.sortBy = document.getElementById('sort-by').value;
+            document.getElementById('category-success').textContent = 'Filters applied successfully!';
+            setTimeout(() => {
+                document.getElementById('category-success').textContent = '';
+            }, 3000);
+            loadRoutes();
+        }
+
+        /*
+            Reset Filters
+            - Clears selected categories and resets sorting
+            - Reloads routes to remove all filters
+        */
+        function resetFilters() {
+            selectedCategories = [];
+            updateSelectedCategories();
+            filters.sortBy = 'distance';
+            document.getElementById('sort-by').value = 'distance';
+            loadRoutes();
+        }
+
+        /*
+            Go Back Function
+            - Navigates the user back to the previous page
+        */
+        function goBack() {
+            window.history.back();
+        }
+
+        /*
+            Open Route Modal
+            - Displays detailed information about a selected route
+            - Calls showRouteCityRank and showRouteTopCategories to populate modal content
+        */
+        async function openRouteModal(route) {
+            const routeModal = document.getElementById('route-modal');
+            const routeInfo = document.getElementById('route-info');
+            const routeCitiesList = document.getElementById('route-cities-list');
+
+            // Display route information
+            const cityNames = route.cities.map(c => c.city);
+            routeInfo.innerHTML = `
+                Route through ${cityNames.join(' ➔ ')}<br>
+                Total Distance: ${route.distance} miles
+            `;
+
+            // List cities in the route with clickable links
+            routeCitiesList.innerHTML = '';
+            for (const cityObj of route.cities) {
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="city-route" data-city="${cityObj.city}" data-state="${cityObj.state}">${cityObj.city}</span>`;
+                li.addEventListener('click', async () => {
+                    // Fetch city info by calling /cities endpoint
+                    const cityInfoRes = await fetch(`http://localhost:8080/cities?cityName=${encodeURIComponent(cityObj.city)}&stateName=${encodeURIComponent(cityObj.state)}`);
+                    const cityInfo = await cityInfoRes.json();
+                    if (cityInfo && cityInfo.cityid) {
+                        document.getElementById('city-name').textContent = `${cityObj.city}, ${cityObj.state} (City ID: ${cityInfo.cityid})`;
+                        openCityModal(route, cityObj.city, cityObj.state, cityInfo);
+                    } else {
+                        alert('City info not found.');
+                    }
+                });
+                routeCitiesList.appendChild(li);
+            }
+
+            // Display city rankings and top categories
+            await showRouteCityRank(route);
+            await showRouteTopCategories(route);
+
+            // Store current route in localStorage
+            localStorage.setItem('currentRoute', JSON.stringify(route));
+            routeModal.style.display = 'block';
+        }
+
+        /*
+            Close Route Modal
+            - Hides the route details modal
+        */
+        function closeRouteModal() {
+            document.getElementById('route-modal').style.display = 'none';
+        }
+
+        /*
+            Open City Modal
+            - Displays detailed information about a selected city
+            - Dynamically fetches and displays subcategories based on the city's attractions
+            - Calls loadAttractions to display attractions within the city
+        */
+        async function openCityModal(route, cityName, cityState, cityInfo=null) {
+            const cityModal = document.getElementById('city-modal');
+            const cityCoordinatesElement = document.getElementById('city-coordinates');
+            const cityPopDensityElement = document.getElementById('city-popdensity');
+            const cityRecsInfo = document.getElementById('city-recs-info');
+            const cityRouteStats = document.getElementById('city-route-stats');
+            const randomAttractionInfo = document.getElementById('random-attraction-info');
+            const attractionFilterSuccess = document.getElementById('attraction-filter-success');
+
+            // Clear previous modal content
+            cityRecsInfo.textContent = '';
+            cityRouteStats.textContent = '';
+            randomAttractionInfo.textContent = '';
+            attractionFilterSuccess.textContent = '';
+
+            // Reset selectedSubcategories to ensure no filters are applied initially
+            selectedSubcategories = [];
+            updateSelectedSubcategories();
+
+            // Fetch city info if not provided
+            if (!cityInfo) {
+                const cityInfoRes = await fetch(`http://localhost:8080/cities?cityName=${encodeURIComponent(cityName)}&stateName=${encodeURIComponent(cityState)}`);
+                cityInfo = await cityInfoRes.json();
+                if (!cityInfo || !cityInfo.cityid) {
+                    alert('City not found in database.');
+                    return;
+                }
+            }
+
+            // Display city information
+            document.getElementById('city-name').textContent = `${cityName}, ${cityState} (City ID: ${cityInfo.cityid})`;
+            cityCoordinatesElement.textContent = `Latitude: ${cityInfo.latitude}, Longitude: ${cityInfo.longitude}`;
+            cityPopDensityElement.textContent = `Population: ${cityInfo.population}, Density: ${cityInfo.density}`;
+
+            // Store current city information in localStorage
+            localStorage.setItem('lastCityId', cityInfo.cityid);
+            localStorage.setItem('currentCity', cityName);
+            localStorage.setItem('currentCityId', cityInfo.cityid);
+
+            // Fetch Neighboring City Recommendations by calling /cityrecs endpoint
+            const recsRes = await fetch(`http://localhost:8080/cityrecs?cityId=${cityInfo.cityid}`);
+            const recsData = await recsRes.json();
+            if (recsData.length === 0) {
+                cityRecsInfo.textContent = 'No neighboring city recommendations.';
+            } else {
+                cityRecsInfo.textContent = recsData.join(', ');
+            }
+
+            // Fetch City Route Statistics by calling /cityNumRoutesAndAvgDist endpoint
+            const routeStatsRes = await fetch(`http://localhost:8080/cityNumRoutesAndAvgDist?cityId=${cityInfo.cityid}`);
+            const routeStatsData = await routeStatsRes.json();
+            if (routeStatsData.length === 0) {
+                cityRouteStats.textContent = 'No route stats available.';
+            } else {
+                const stats = routeStatsData[0];
+                cityRouteStats.textContent = `This city connects to ${stats.numroutes} routes with an average distance of ${stats.avg_distance.toFixed(2)} miles.`;
+            }
+
+            // Fetch a Random Attraction by calling /randomAttraction endpoint
+            const randomRes = await fetch(`http://localhost:8080/randomAttraction?state=${encodeURIComponent(cityInfo.state)}`);
+            const randomData = await randomRes.json();
+            if (!randomData || !randomData.attraction) {
+                randomAttractionInfo.textContent = 'No random attraction found.';
+            } else {
+                // Display compact details of the random attraction
+                const address = randomData.address ? randomData.address : 'No address provided';
+                randomAttractionInfo.innerHTML = `
+                    <strong>${randomData.attraction}</strong><br>
+                    Address: ${address}<br>
+                    Rating: ${randomData.rating}<br>
+                    Categories: ${randomData.categories}
+                `;
+            }
+
+            /* 
+                Fetch Subcategories for the City by calling /attractions endpoint and extracting unique subcategories
+                - Dynamically populate subcategory dropdown based on the city's attractions
+            */
+            try {
+                // Fetch all attractions for the city to extract unique subcategories
+                let attractionsUrl = `http://localhost:8080/attractions?cityId=${cityInfo.cityid}`;
+                if (selectedCategories.length > 0) {
+                    // Only include category parameters if categories are selected
+                    attractionsUrl += `&category1=${encodeURIComponent(selectedCategories[0])}`;
+                    if (selectedCategories[1]) attractionsUrl += `&category2=${encodeURIComponent(selectedCategories[1])}`;
+                    if (selectedCategories[2]) attractionsUrl += `&category3=${encodeURIComponent(selectedCategories[2])}`;
+                }
+
+                const attractionsRes = await fetch(attractionsUrl);
+                const attractionsData = await attractionsRes.json();
+
+                // Extract unique subcategories from the fetched attractions
+                const uniqueSubcategories = new Set();
+                attractionsData.forEach(attraction => {
+                    if (attraction.subcategories) {
+                        attraction.subcategories.split(',').forEach(sub => {
+                            uniqueSubcategories.add(sub.trim());
+                        });
+                    }
+                });
+
+                const subcategoriesArray = Array.from(uniqueSubcategories);
+
+                // Populate the subcategory dropdown with the unique subcategories
+                const subcategoryOptionsContainer = document.getElementById('subcategory-options');
+                subcategoryOptionsContainer.innerHTML = ''; // Clear any existing options
+
+                if (subcategoriesArray.length === 0) {
+                    // If no subcategories are found, display a message
+                    const noSubs = document.createElement('div');
+                    noSubs.textContent = 'No subcategories available.';
+                    noSubs.style.padding = '10px';
+                    subcategoryOptionsContainer.appendChild(noSubs);
+                } else {
+                    subcategoriesArray.forEach(subcat => {
+                        const optionDiv = document.createElement('div');
+                        optionDiv.textContent = subcat;
+                        optionDiv.dataset.value = subcat;
+                        optionDiv.addEventListener('click', () => selectSubcategory(optionDiv)); // Event listener for selecting a subcategory
+                        subcategoryOptionsContainer.appendChild(optionDiv);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching subcategories:', error);
+                const subcategoryOptionsContainer = document.getElementById('subcategory-options');
+                subcategoryOptionsContainer.innerHTML = '<div style="padding:10px;">Error loading subcategories.</div>';
+            }
+
+            // Load attractions without any subcategory filters initially
+            await loadAttractions(cityInfo.cityid);
+
+            // Display the city modal
+            cityModal.style.display = 'block';
+        }
+
+        /*
+            Close City Modal
+            - Hides the city details modal
+        */
+        function closeCityModal() {
+            document.getElementById('city-modal').style.display = 'none';
+        }
+
+        /*
+            Load Attractions
+            - Fetches attractions for a city by calling /attractions endpoint with selected categories
+            - Filters attractions on the frontend based on selected subcategories
+            - Displays backup attractions by calling /backupAttractions if no matches are found
+            - Provides user feedback through success messages
+        */
+        async function loadAttractions(cityId) {
+            const attractionsList = document.getElementById('attractions-list');
+            const attractionFilterSuccess = document.getElementById('attraction-filter-success');
+            attractionsList.innerHTML = '';
+            attractionFilterSuccess.textContent = '';
+
+            let allAttractions = [];
+
+            try {
+                // Build the URL based on whether categories are selected
+                let attractionUrl = `http://localhost:8080/attractions?cityId=${cityId}`;
+                if (selectedCategories.length > 0) {
+                    attractionUrl += `&category1=${encodeURIComponent(selectedCategories[0])}`;
+                    if (selectedCategories[1]) attractionUrl += `&category2=${encodeURIComponent(selectedCategories[1])}`;
+                    if (selectedCategories[2]) attractionUrl += `&category3=${encodeURIComponent(selectedCategories[2])}`;
+                }
+
+                // Fetch attractions for the city with selected categories (if any)
+                const res = await fetch(attractionUrl);
+                allAttractions = await res.json();
+            } catch (error) {
+                console.error('Error fetching attractions:', error);
+                attractionsList.innerHTML = '<li>Error loading attractions.</li>';
+                return;
+            }
+
+            if (!Array.isArray(allAttractions)) {
+                attractionsList.innerHTML = '<li>No attractions found.</li>';
+                return;
+            }
+
+            let filteredAttractions = allAttractions;
+
+            // Filter based on selected subcategories if any
+            if (selectedSubcategories.length > 0) {
+                filteredAttractions = filteredAttractions.filter(attraction => {
+                    if (!attraction.subcategories) return false;
+                    const attractionSubcategories = attraction.subcategories.split(',').map(sub => sub.trim());
+                    return selectedSubcategories.some(selectedSubcat => attractionSubcategories.includes(selectedSubcat));
+                });
+            }
+
+            if (filteredAttractions.length === 0) {
+                // If no attractions match the filters, attempt to fetch backup attractions
+                try {
+                    let backupUrl = `http://localhost:8080/backupAttractions?cityId=${cityId}`;
+                    if (selectedCategories.length > 0) {
+                        backupUrl += `&category1=${encodeURIComponent(selectedCategories[0])}`;
+                        if (selectedCategories[1]) backupUrl += `&category2=${encodeURIComponent(selectedCategories[1])}`;
+                        if (selectedCategories[2]) backupUrl += `&category3=${encodeURIComponent(selectedCategories[2])}`;
+                    }
+
+                    const backupRes = await fetch(backupUrl);
+                    const backupData = await backupRes.json();
+
+                    if (Array.isArray(backupData) && backupData.length > 0) {
+                        // Additionally filter backup attractions based on subcategories if any
+                        backupData.forEach(attraction => {
+                            if (selectedSubcategories.length > 0) {
+                                if (!attraction.subcategories) return;
+                                const attractionSubcategories = attraction.subcategories.split(',').map(sub => sub.trim());
+                                if (!selectedSubcategories.some(selectedSubcat => attractionSubcategories.includes(selectedSubcat))) {
+                                    return; // Skip attractions that don't match subcategories
+                                }
+                            }
+
+                            const li = document.createElement('li');
+                            const attName = attraction.attraction || attraction.name; 
+                            const address = attraction.address ? attraction.address : 'No address provided';
+                            const rating = attraction.rating ? attraction.rating : 'N/A';
+                            const categories = attraction.categories ? attraction.categories : 'N/A';
+                            const subcategories = attraction.subcategories ? attraction.subcategories : 'N/A';
+
+                            li.innerHTML = `
+                                <div class="attraction-details">
+                                    <strong>${attName}</strong><br>
+                                    Address: ${address}<br>
+                                    Rating: ${rating}<br>
+                                    Categories: ${categories}<br>
+                                    Subcategories: ${subcategories}
+                                </div>
+                            `;
+                            attractionsList.appendChild(li);
+                        });
+                        attractionFilterSuccess.textContent = 'Displayed backup attractions matching subcategories.';
+                    } else {
+                        const li = document.createElement('li');
+                        li.textContent = 'No attractions found.';
+                        attractionsList.appendChild(li);
+                        attractionFilterSuccess.textContent = 'No attractions available to display.';
+                    }
+                } catch (error) {
+                    console.error('Error fetching backup attractions:', error);
+                    attractionsList.innerHTML = '<li>Error loading attractions.</li>';
+                }
+            } else {
+                // Display filtered attractions (based only on categories)
+                filteredAttractions.forEach(attraction => {
+                    const li = document.createElement('li');
+                    const attName = attraction.attraction || attraction.name; 
+                    const address = attraction.address ? attraction.address : 'No address provided';
+                    const rating = attraction.rating ? attraction.rating : 'N/A';
+                    const categories = attraction.categories ? attraction.categories : 'N/A';
+                    const subcategories = attraction.subcategories ? attraction.subcategories : 'N/A';
+
+                    li.innerHTML = `
+                        <div class="attraction-details">
+                            <strong>${attName}</strong><br>
+                            Address: ${address}<br>
+                            Rating: ${rating}<br>
+                            Categories: ${categories}<br>
+                            Subcategories: ${subcategories}
+                        </div>
+                    `;
+                    attractionsList.appendChild(li);
+                });
+                attractionFilterSuccess.textContent = 'Attractions loaded successfully!';
+                setTimeout(() => {
+                    attractionFilterSuccess.textContent = '';
+                }, 3000);
+            }
+        }
+
+        /*
+            Apply Attraction Filters
+            - Reloads attractions based on current selected subcategories
+        */
+        async function applyAttractionFilters() {
+            const cityId = localStorage.getItem('currentCityId');
+            await loadAttractions(cityId);
+        }
+
+        /*
+            Reset Attraction Filters
+            - Clears selected subcategories and reloads attractions without subcategory filters
+        */
+        async function resetAttractionFilters() {
+            const cityId = localStorage.getItem('currentCityId');
+
+            selectedSubcategories = [];
+            updateSelectedSubcategories();
+
+            // Reload attractions without any subcategory filters
+            await loadAttractions(cityId);
+        }
+
+        /*
+            On Page Load:
+            - Validates presence of necessary form data
+            - Fetches routes based on user input by calling /routes endpoint
+            - Displays routes using loadRoutes function
+        */
+        window.onload = async function() {
+            if (!formData || !formData.sourceCity || !formData.sourceState || !formData.destinationCity || !formData.destinationState || formData.maxCities === undefined) {
+                alert('Please fill out the form correctly.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            updateSelectedCategories();
+
+            const numInt = formData.maxCities; 
+            const startCity = formData.sourceCity;
+            const startState = formData.sourceState;
+            const endCity = formData.destinationCity;
+            const endState = formData.destinationState;
+
+            // Fetch routes by calling /routes endpoint
+            const routesData = await fetchRoutesData(numInt, startCity, startState, endCity, endState);
+
+            if (!Array.isArray(routesData) || routesData.length === 0) {
+                document.getElementById('results-count').textContent = 'No Results Found';
+                return;
+            }
+
+            // Convert and store routes data
+            allRoutes = convertRoutesResponse(routesData, numInt);
+            loadRoutes();
+        };
+
+        /*
+            Close Modals When Clicking Outside of Them
+            - Listens for window clicks to close open modals if the click is outside the modal content
+        */
+        window.onclick = function(event) {
+            const routeModal = document.getElementById('route-modal');
+            const cityModal = document.getElementById('city-modal');
+            if (event.target == routeModal) {
+                closeRouteModal();
+            }
+            if (event.target == cityModal) {
+                closeCityModal();
+            }
+        };
+    </script>
+</body>
+</html>
